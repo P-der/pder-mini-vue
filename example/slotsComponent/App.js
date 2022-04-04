@@ -1,4 +1,4 @@
-import { h } from "../../lib/mini-vue.esm.js";
+import { h, createTextVnode } from "../../lib/mini-vue.esm.js";
 import Child from "./Child.js";
 
 export default {
@@ -21,6 +21,7 @@ export default {
           ],
         }
       ),
+      createTextVnode('创建一个文本节点')
     ]);
   },
 };

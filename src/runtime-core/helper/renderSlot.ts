@@ -1,5 +1,6 @@
 import { h } from "../h";
-import { Fragment } from "../render";
+import { Fragment } from "../vnode";
+
 
 export function renderSlot(slots, name, props) {
     const slot = slots[name];
