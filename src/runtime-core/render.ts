@@ -1,16 +1,27 @@
 import { ShapeFlags } from "../shared/shapeFlags"
 import { createComponentInstance, setupComponent } from "./component"
-
+export const Fragment = Symbol('Fragment')
 export function render(vnode, container) {
     patch(vnode, container)
 }
 
 function patch(vnode, container) {
-    if(vnode.shapeFlag & ShapeFlags.ELEMENT) {
-        processElement(vnode,container)
-    }else if(vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
-        processComponent(vnode, container)
+    const {type} = vnode
+    switch (type) {
+        case Fragment:
+            processFragment(vnode, container)
+            break;
+        default:
+            if(vnode.shapeFlag & ShapeFlags.ELEMENT) {
+                processElement(vnode,container)
+            }else if(vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT){
+                processComponent(vnode, container)
+            }
     }
+   
+}
+function processFragment(vnode, container) {
+    mountChildren(vnode.children, container)
 }
 function processComponent(vnode, container) {
     mountComponent(vnode, container)
@@ -19,7 +30,9 @@ function processElement(vnode, container) {
     mountElement(vnode, container)
 }
 function mountElement(vnode, container) {
+    const {children, shapeFlag} = vnode
     let el = document.createElement(vnode.type)
+    vnode.el = el
     let isOn = (key) => /^on[A-Z]/.test(key)
     // 处理props
     if(vnode.props) {
@@ -33,21 +46,17 @@ function mountElement(vnode, container) {
         }
     }
     // 处理children
-    mountChildren(vnode, el)
-    container.append(el)
-    vnode.el = el
-}
-function mountChildren({children, shapeFlag}, container) {
-    if(!children) {
-        return
-    }
     if( shapeFlag & ShapeFlags.TEXT_CHILDREN) {
-        container.innerText = children
+        el.append(children)
     }else if(shapeFlag & ShapeFlags.ARRAY_CHILDREN){
-        children.forEach(v => {
-            patch(v, container)
-        })
+        mountChildren(children, el)
     }
+    container.append(el)
+}
+function mountChildren(children, container) {
+    children.forEach(v => {
+        patch(v, container)
+    })
 }
 function mountComponent(initialVNode, container) {
     const instance = createComponentInstance(initialVNode)
