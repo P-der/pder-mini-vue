@@ -4,13 +4,15 @@ import { initProps } from "./componentProps"
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance"
 import { initSlots } from "./componentSlots";
 let currentInstance = null
-export function createComponentInstance(vnode) {
+export function createComponentInstance(vnode, parent) {
     const instance = {
         vnode,
         type: vnode.type,
         setupState: {},
         emit: ()=> {},
         slots: {}, // 存放插槽的数据
+        provides: parent? parent.provides:{},
+        parent, 
     }
     instance.emit = emit.bind(null, instance) as any;
     return instance
