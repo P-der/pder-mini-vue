@@ -7,7 +7,6 @@ export function render(vnode, container) {
 
 function patch(vnode, container) {
     const {type} = vnode
-    console.log(type)
     switch (type) {
         case Fragment:
             processFragment(vnode, container)
