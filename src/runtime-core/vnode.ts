@@ -2,12 +2,13 @@ import { isObject } from '../shared/index'
 import {ShapeFlags} from '../shared/shapeFlags'
 export const Text = Symbol("Text");
 export const Fragment = Symbol('Fragment')
-export function createVnode(type, props = {}, children?) {
+export function createVnode(type, props?, children?) {
     let vnode = {
         type,
         props,
         children,
         el: null,
+        key: props && props.key,
         shapeFlag: getShapeFlags(type)
     }
     if(typeof vnode.children === 'string') {
