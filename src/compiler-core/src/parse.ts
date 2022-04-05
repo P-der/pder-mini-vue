@@ -1,4 +1,4 @@
-import { NodeTypes,TagType} from "./ast";
+import { NodeTypes, TagType } from "./ast";
 
 export function baseParse(content: string) {
     const context = createParserContext(content);
@@ -13,28 +13,79 @@ function createRoot(children) {
     return {
         children,
         type: NodeTypes.ROOT
-      };
+    };
 }
 function parseChildren(context, ancestors) {
-    // {{ message }}
     let nodes: any[] = []
-    let node 
-    if(context.source.startsWith('{{')) {
-       node = parseInterpolation(context)   
-    }else if(context.source.startsWith('<')) {
-        node = parseElement(context)
+    let node
+    while (!isEnd(context, ancestors)) {
+        if (context.source.startsWith('{{')) {
+            node = parseInterpolation(context)
+        } else if (context.source.startsWith('<')) {
+            node = parseElement(context, ancestors)
+        } else {
+            node = parseText(context);
+        }
+        nodes.push(node)
     }
-    nodes.push(node)
     return nodes;
 }
-function parseElement (context) {
+function isEnd(context, ancestors) {
+    let source = context.source
+    if (context.source.startsWith("</")) {
+        for (let i = ancestors.length - 1; i >= 0; i--) {
+            const tag = ancestors[i];
+            if (startsWithEndTagOpen(source, tag)) {
+                return true;
+            }
+        }
+
+    }
+    return !context.source
+}
+function parseText(context) {
+    let endIndex = context.source.length;
+    let endTokens = ["<", "{{"];
+    for (let i = 0; i < endTokens.length; i++) {
+        const index = context.source.indexOf(endTokens[i]);
+        if (index !== -1 && endIndex > index) {
+            endIndex = index;
+        }
+    }
+    const content = context.source.slice(0, endIndex);
+
+    advanceBy(context, endIndex);
+    return {
+        type: NodeTypes.TEXT,
+        content
+    }
+}
+function parseElement(context, ancestors) {
     const element: any = parseTag(context, TagType.Start);
-    parseTag(context, TagType.End)
+
+    ancestors.push(element.tag)
+
+    element.children = parseChildren(context, ancestors);
+    ancestors.pop()
+
+    if (startsWithEndTagOpen(context.source, element.tag)) {
+        parseTag(context, TagType.End);
+    } else {
+        throw new Error(`缺失结束标签：${element.tag}`);
+    }
+
     return element
+}
+
+function startsWithEndTagOpen(source, tag) {
+    return (
+        source.startsWith("</") &&
+        source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase()
+    );
 }
 function parseTag(context, type) {
     const match: any = /^<\/?([a-z]*)/i.exec(context.source);
-    advanceBy(context, match[0].length+1);
+    advanceBy(context, match[0].length + 1);
     const tag = match[1];
     if (type === TagType.End) return;
     return {
@@ -63,5 +114,4 @@ function parseInterpolation(context) {
 }
 function advanceBy(context: any, length: number) {
     context.source = context.source.slice(length);
-  }
-
+}
