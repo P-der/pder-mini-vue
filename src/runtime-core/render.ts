@@ -41,7 +41,11 @@ export function createRenderer(options) {
         mountChildren(n2.children, container, parentInstance)
     }
     function processComponent(n1, n2, container, parentInstance) {
-        mountComponent(n2, container, parentInstance)
+        if(!n1) {
+            mountComponent(n2, container, parentInstance)
+        }else {
+            updateCompoent(n1, n2)
+        }
     }
     function processElement(n1, n2, container, parentInstance, anchor) {
         if (!n1) {
@@ -49,6 +53,44 @@ export function createRenderer(options) {
         } else {
             patchElement(n1, n2, container, parentInstance)
         }
+    }
+    function updateCompoent(n1,n2) {
+        const instance = (n2.component = n1.component);
+        if(shouldUpdateComponent(n1,n2)) {
+            console.log('update component')
+            instance.next = n2;
+            instance.update()
+        }else {
+            n2.component = n1.component;
+            n2.el = n1.el;
+            instance.vnode = n2;
+        }
+    }
+    function shouldUpdateComponent(prevVNode,nextVNode) {
+        const { props: prevProps } = prevVNode;
+        const { props: nextProps } = nextVNode;
+        if(prevProps === nextProps) {
+            return false
+        }
+        if (!prevProps) {
+            return !!nextProps;
+        }
+        if (!nextProps) {
+            return true;
+        }
+        
+        const nextKeys = Object.keys(nextProps);
+        if (nextKeys.length !== Object.keys(prevProps).length) {
+            return true;
+        }
+
+        for (let i = 0; i < nextKeys.length; i++) {
+            const key = nextKeys[i];
+            if (nextProps[key] !== prevProps[key]) {
+              return true;
+            }
+        }
+        return false
     }
     function mountText(vnode, container) {
         let el = hostCreateText(vnode.children)
@@ -242,12 +284,14 @@ export function createRenderer(options) {
     function mountComponent(initialVNode, container, parentInstance) {
         const instance = createComponentInstance(initialVNode, parentInstance)
 
+        initialVNode.component = instance
+        
         setupComponent(instance)
 
         setupRenderEffect(instance, initialVNode, container)
     }
     function setupRenderEffect(instance, initialVNode, container) {
-        effect(() => {
+        instance.update = effect(() => {
             const { proxy, isMounted } = instance
             if (!isMounted) {
                 const subTree = instance.subTree = instance.render.call(proxy)
@@ -255,14 +299,29 @@ export function createRenderer(options) {
                 initialVNode.el = subTree.el
                 instance.isMounted = true
             } else {
-                const subTree = instance.render.call(proxy)
+                const { next, vnode } = instance;
+                if (next) {
+                    next.el = vnode.el;
+                    updateComponentPreRender(instance, next);
+                }
+
+                const nextTree = instance.render.call(proxy)
                 const preTree = instance.subTree
-                instance.subTree = subTree
-                patch(preTree, subTree, container, instance)
-                // initialVNode.el = subTree.el
+               
+                instance.subTree = nextTree
+                 // 替换之前的 subTree
+                patch(preTree, nextTree, container, instance)
             }
 
         })
+    }
+    function updateComponentPreRender(instance, nextVnode) {
+        nextVnode.component = instance;
+        instance.vnode = nextVnode;
+        instance.next = null;
+    
+        const { props } = nextVnode;
+        instance.props = props;
     }
     return {
         createApp: createAppAPI(render),
