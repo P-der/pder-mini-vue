@@ -3,6 +3,7 @@ import { createComponentInstance, setupComponent } from "./component"
 import { Fragment, Text } from "./vnode"
 import { createAppAPI } from "./createApp";
 import { effect } from "../index";
+import { queueJob } from "./scheduler";
 export function createRenderer(options) {
     const {
         createElement: hostCreateElement,
@@ -285,7 +286,7 @@ export function createRenderer(options) {
         const instance = createComponentInstance(initialVNode, parentInstance)
 
         initialVNode.component = instance
-        
+
         setupComponent(instance)
 
         setupRenderEffect(instance, initialVNode, container)
@@ -313,6 +314,10 @@ export function createRenderer(options) {
                 patch(preTree, nextTree, container, instance)
             }
 
+        }, {
+            scheduler:()=> {
+                queueJob(instance.update);
+            }
         })
     }
     function updateComponentPreRender(instance, nextVnode) {

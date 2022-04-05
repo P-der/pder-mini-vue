@@ -5,3 +5,4 @@ export * from "./vnode"
 export * from "./component"
 export * from "./injectApi"
 export { createRenderer } from "./render";
+export { nextTick } from './scheduler'
