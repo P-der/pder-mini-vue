@@ -22,12 +22,16 @@ function setElementText(el, text) {
   el.textContent = text;
 }
 
-function patchProp(el, key, value) {
+function patchProp(el, key, newValue, oldValue) {
   if (isOn(key)) {
     let event = key.slice(2).toLowerCase()
-    el.addEventListener(event, value)
+    el.addEventListener(event, newValue)
 } else {
-    el.setAttribute(key, value)
+    if(!newValue) {
+      el.removeAttribute(key)
+    }else {
+      el.setAttribute(key, newValue)
+    }
 }
 }
 

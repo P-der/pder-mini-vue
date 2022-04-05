@@ -1,4 +1,4 @@
-import { h } from "../../lib/mini-vue.esm.js";
+import { h, ref } from "../../lib/mini-vue.esm.js";
 // const count = ref(0);
 const HelloWorld = {
   name: "HelloWorld",
@@ -31,13 +31,25 @@ const HelloWorld = {
 export default {
   name: "App",
   setup() {
+    let text = ref(0)
+    return {
+      text,
+      handle() {
+        text.value ++
+      }
+    }
   },
 
   render() {
-    return h("div", { tId: 1 , onClick() {
-      // console.log('click')
-    }}, [h("p", {}, "主页"), h(HelloWorld, {count: 1000, onAdd(){
-      console.log('on add ')
-    }})]);
+    // return h("div", { tId: 1 , onClick() {
+    //   // console.log('click')
+    // }}, [h("p", {}, "主页"), h(HelloWorld, {count: 1000, onAdd(){
+    //   console.log('on add ')
+    // }})]);
+    console.log(this.text)
+    return h('div', {}, [
+      h('button', {onClick:this.handle}, 'btn'),
+      h('h1', {},  `count: ${this.text}`)
+    ])
   },
 };
