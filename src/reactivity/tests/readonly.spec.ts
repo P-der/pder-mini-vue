@@ -1,4 +1,4 @@
-import { isProxy, isReactive, isReadonly,  readonly } from "../reactive";
+import { isProxy, isReactive, isReadonly,  readonly } from "../index";
 
 describe("readonly", () => {
   test("should make nested values readonly", () => {

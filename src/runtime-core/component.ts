@@ -1,5 +1,5 @@
-import { proxyRefs } from "../reactivity/ref";
-import { shallowReadonly } from "../reactivity/reactive";
+import { proxyRefs } from "../reactivity/index";
+import { shallowReadonly } from "../reactivity/index";
 import { emit } from "./componentEmit";
 import { initProps } from "./componentProps"
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance"

@@ -1,4 +1,4 @@
-import { isReactive, isReadonly, reactive, readonly, shallowReadonly } from "../reactive";
+import { isReactive, isReadonly, reactive, readonly, shallowReadonly } from "../index";
 
 describe('reactive', ()=> {
     test('init', ()=> {

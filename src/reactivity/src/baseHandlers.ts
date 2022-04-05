@@ -1,4 +1,4 @@
-import { isObject } from "../shared/index"
+import { isObject } from "../../shared/index"
 import { track, trigger } from "./effect"
 import { readonly, reactive } from "./reactive"
 import { ReactiveFlags } from './reactiveMap'

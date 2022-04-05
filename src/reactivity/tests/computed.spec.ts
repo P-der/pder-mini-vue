@@ -1,5 +1,4 @@
-import { computed } from "../computed";
-import { reactive } from "../reactive";
+import { computed, reactive } from "../index";
 
 describe("computed", () => {
   test("init", () => {

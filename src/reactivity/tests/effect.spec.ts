@@ -1,5 +1,4 @@
-import { effect, stop } from "../effect"
-import { reactive } from "../reactive"
+import { effect, stop, reactive } from '../index'
 
 describe('effect', () => {
     test('init', () => {
