@@ -1,5 +1,6 @@
-import { baseParse, NodeTypes, transform } from "../index";
-
+import { baseParse } from '../src/parse'
+import { transform } from '../src/transform'
+import { NodeTypes } from '../src/ast'
 describe("transform", () => {
   it("happy path", () => {
     const ast = baseParse("<div>hi,{{message}}</div>");

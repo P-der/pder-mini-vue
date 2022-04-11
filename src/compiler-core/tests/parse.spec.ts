@@ -1,5 +1,5 @@
-import { baseParse, NodeTypes } from "../index";
-
+import { NodeTypes } from "../src/ast";
+import { baseParse,  } from "../src/parse";
 describe("Parse", () => {
   test("simple interpolation", () => {
     const ast = baseParse("{{ message }}");

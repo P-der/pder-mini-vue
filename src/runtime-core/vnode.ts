@@ -35,3 +35,4 @@ function getShapeFlags(type) {
         return ShapeFlags.STATEFUL_COMPONENT
     }
 }
+export { createVnode as createElementVNode };
